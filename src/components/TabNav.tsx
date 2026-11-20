@@ -1,8 +1,6 @@
 import { ArrowDownUp, Settings, Users, Box } from 'lucide-react';
-import ConnectWallet from '@/components/ConnectWalletButton';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import { ChangeMultisigFromNav } from './ChangeMultisigFromNav';
 
 export default function TabNav() {
   const location = useLocation();
@@ -55,10 +53,6 @@ export default function TabNav() {
                 );
               })}
             </ul>
-          </div>
-          <div className="space-y-2 border-t border-[#1e2028] pt-4">
-            <ChangeMultisigFromNav />
-            <ConnectWallet />
           </div>
         </div>
       </aside>
