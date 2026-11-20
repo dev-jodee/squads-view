@@ -6,7 +6,7 @@ import { PublicKey } from '@solana/web3.js';
 import { useMultisig } from '@/hooks/useServices';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Suspense, useState } from 'react';
-import { useProgram } from '../hooks/useProgram';
+import { useProgram, useVaultPrograms } from '../hooks/useProgram';
 import CreateProgramUpgradeInput from '../components/CreateProgramUpgradeInput';
 
 const ProgramsPage = () => {
@@ -19,6 +19,7 @@ const ProgramsPage = () => {
 
   // Only use the hook when we have a validated program ID
   const { data: programInfos } = useProgram(validatedProgramId);
+  const vaultPrograms = useVaultPrograms();
 
   // Validate the program ID
   const validateProgramId = () => {
@@ -53,6 +54,41 @@ const ProgramsPage = () => {
       <Suspense fallback={<div>Loading...</div>}>
         <div className="">
           <h1 className="mb-4 text-3xl font-bold">Program Manager</h1>
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle>Vault Programs</CardTitle>
+              <CardDescription>
+                Programs whose upgrade authority is the selected vault. Pick one to manage it.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {vaultPrograms.isLoading && (
+                <p className="text-sm text-muted-foreground">Searching...</p>
+              )}
+              {vaultPrograms.isError && (
+                <p className="text-sm text-muted-foreground">
+                  This RPC refused the program search. Enter a Program ID below instead.
+                </p>
+              )}
+              {vaultPrograms.data?.length === 0 && (
+                <p className="text-sm text-muted-foreground">No programs found for this vault.</p>
+              )}
+              {vaultPrograms.data?.map((program) => (
+                <Button
+                  key={program}
+                  variant={program === validatedProgramId ? 'default' : 'outline'}
+                  className="w-full justify-start whitespace-normal break-all font-mono"
+                  onClick={() => {
+                    setProgramIdInput(program);
+                    setProgramIdError('');
+                    setValidatedProgramId(program);
+                  }}
+                >
+                  {program}
+                </Button>
+              ))}
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader>
               <CardTitle>Program</CardTitle>

@@ -1,7 +1,9 @@
 import { useMultisigData } from './useMultisigData';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { AccountInfo, ParsedAccountData, PublicKey, RpcResponseAndContext } from '@solana/web3.js';
 import invariant from 'invariant';
+import bs58 from 'bs58';
+import { BPF_UPGRADEABLE_LOADER_ID } from '@/lib/transaction/describe/misc';
 
 export interface SimplifiedProgramInfo {
   programAddress: string;
@@ -54,6 +56,48 @@ export const useProgram = (managedProgramId: string | null) => {
       } catch (error) {
         return null;
       }
+    },
+  });
+};
+
+const PROGRAM_DATA_TAG = bs58.encode(Uint8Array.from([3, 0, 0, 0]));
+const PROGRAM_ACCOUNT_SIZE = 36;
+
+export const useVaultPrograms = () => {
+  const { connection, multisigVault } = useMultisigData();
+
+  return useQuery({
+    queryKey: ['vaultPrograms', connection.rpcEndpoint, multisigVault?.toBase58()],
+    enabled: !!multisigVault,
+    queryFn: async (): Promise<string[]> => {
+      const loader = new PublicKey(BPF_UPGRADEABLE_LOADER_ID);
+      const programDatas = await connection.getProgramAccounts(loader, {
+        dataSlice: { offset: 0, length: 0 },
+        filters: [
+          { memcmp: { offset: 0, bytes: PROGRAM_DATA_TAG } },
+          {
+            memcmp: {
+              offset: 12,
+              bytes: bs58.encode(Uint8Array.from([1, ...multisigVault!.toBytes()])),
+            },
+          },
+        ],
+      });
+      const programs = await Promise.all(
+        programDatas.map(({ pubkey }) =>
+          connection.getProgramAccounts(loader, {
+            dataSlice: { offset: 0, length: 0 },
+            filters: [
+              { dataSize: PROGRAM_ACCOUNT_SIZE },
+              { memcmp: { offset: 4, bytes: pubkey.toBase58() } },
+            ],
+          })
+        )
+      );
+      return programs
+        .flat()
+        .map(({ pubkey }) => pubkey.toBase58())
+        .sort();
     },
   });
 };
