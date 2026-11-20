@@ -5,14 +5,12 @@ import { AlertTriangle, CheckSquare } from 'lucide-react';
 import { Toaster } from './components/ui/sonner';
 import TabNav from './components/TabNav';
 
-import HomePage from './routes/_index';
 import ConfigPage from './routes/config';
 import CreatePage from './routes/create';
 import SettingsPage from './routes/settings';
 import TransactionsPage from './routes/transactions';
 import ProgramsPage from './routes/programs';
-import ValidatorsPage from './routes/validators';
-import { Routes, Route, HashRouter } from 'react-router-dom';
+import { Routes, Route, HashRouter, Navigate } from 'react-router-dom';
 
 import './styles/global.css'; // Load Tailwind styles
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -32,13 +30,12 @@ const App = () => {
               <ErrorBoundary>
                 <Suspense fallback={<p>Loading...</p>}>
                   <Routes>
-                    <Route index path="/" element={<HomePage />} />
+                    <Route index path="/" element={<Navigate to="/settings" replace />} />
                     <Route path="/config" element={<ConfigPage />} />
                     <Route path="/create" element={<CreatePage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/transactions" element={<TransactionsPage />} />
                     <Route path="/programs" element={<ProgramsPage />} />
-                    <Route path="/validators" element={<ValidatorsPage />} />
                     <Route path="*" element={<p>404 - Not Found</p>} /> {/* Catch-all route */}
                   </Routes>
                 </Suspense>

@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import SetExplorerInput from '../components/SetExplorerInput';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Suspense } from 'react';
+import ConnectWallet from '@/components/ConnectWalletButton';
+import RenderMultisigRoute from '@/components/RenderMultisigRoute';
 
 const SettingsPage = () => {
   return (
@@ -12,6 +14,16 @@ const SettingsPage = () => {
         <div>
           <h1 className="mb-4 text-3xl font-bold">Settings</h1>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Wallet</CardTitle>
+                <CardDescription>Connect the wallet you sign with.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ConnectWallet />
+              </CardContent>
+            </Card>
+            <RenderMultisigRoute />
             <Card>
               <CardHeader>
                 <CardTitle>RPC Url</CardTitle>

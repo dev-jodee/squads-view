@@ -14,8 +14,9 @@ export function VaultDisplayer({}: VaultDisplayerProps) {
         <CardTitle>Squads Vault</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="mb-1">Address: {vaultAddress?.toBase58()}</p>
-        <br />
+        <p className="mb-4 break-all font-mono text-sm text-muted-foreground">
+          {vaultAddress?.toBase58()}
+        </p>
         <VaultSelector />
       </CardContent>
     </Card>

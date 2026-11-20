@@ -16,6 +16,7 @@ import {
 import { identifyInstructionByDiscriminator } from '../lib/discriminators';
 import { useMultisigAddress } from '../hooks/useMultisigAddress';
 import { toast } from 'sonner';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 interface MultisigLookupProps {
   onUpdate: () => void;
@@ -108,66 +109,69 @@ const MultisigLookup: React.FC<MultisigLookupProps> = ({ onUpdate }) => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-4 px-4 py-6 sm:px-6 md:py-10 lg:px-8">
-      <h1>Search for Multisig Config Address</h1>
-      <p className="text-sm text-gray-500">
-        If you can't access your settings in main Squads app UI to find the multisig config address,
-        enter your vault address below to do a search via onchain call.
-      </p>
-      <Input
-        type="text"
-        placeholder="Vault Address"
-        className="mt-2 w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200 sm:text-sm"
-        value={vaultAddress}
-        onChange={(e) => setVaultAddress(e.target.value.trim())}
-      />
-      <Button
-        onClick={() =>
-          toast.promise(search, {
-            id: 'mksKeySearch',
-            loading: 'Loading...',
-            success: 'Search finished.',
-            error: (e) => `Failed to propose: ${formatTransactionError(e)}`,
-          })
-        }
-        className="mt-4"
-        disabled={searching}
-      >
-        {searching ? 'Searching...' : 'Search'}
-      </Button>
+    <Card className="sm:col-span-2">
+      <CardHeader>
+        <CardTitle>Find Squad</CardTitle>
+        <CardDescription>
+          If you can't access your settings in main Squads app UI to find the multisig config
+          address, enter your vault address below to do a search via onchain call.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <Input
+          type="text"
+          placeholder="Vault Address"
+          value={vaultAddress}
+          onChange={(e) => setVaultAddress(e.target.value.trim())}
+        />
+        <Button
+          onClick={() =>
+            toast.promise(search, {
+              id: 'mksKeySearch',
+              loading: 'Loading...',
+              success: 'Search finished.',
+              error: (e) => `Failed to propose: ${formatTransactionError(e)}`,
+            })
+          }
+          disabled={searching}
+        >
+          {searching ? 'Searching...' : 'Search'}
+        </Button>
 
-      {statusMessages.length > 0 && (
-        <ul className="mt-4 h-[100px] overflow-y-auto rounded border border-gray-300 p-2 text-sm text-gray-600">
-          {statusMessages.map((msg, index) => (
-            <li key={index}>
-              <pre className="text-xs">{msg}</pre>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {foundMultisigs.size > 0 && (
-        <>
-          Found Multisig Config Address!
-          <ul className="mt-4">
-            {[...foundMultisigs].map((msKey, index) => {
-              return (
-                <li key={`ms-${index}`}>
-                  <Button
-                    onClick={async () => {
-                      setForceCancel(true);
-                      await setMultisigAddress.mutateAsync(msKey); // Save using React Query
-                    }}
-                  >
-                    Use {msKey}
-                  </Button>
-                </li>
-              );
-            })}
+        {statusMessages.length > 0 && (
+          <ul className="mt-4 h-[100px] overflow-y-auto rounded-md border p-2 text-sm text-muted-foreground">
+            {statusMessages.map((msg, index) => (
+              <li key={index}>
+                <pre className="text-xs">{msg}</pre>
+              </li>
+            ))}
           </ul>
-        </>
-      )}
-    </div>
+        )}
+
+        {foundMultisigs.size > 0 && (
+          <>
+            Found Multisig Config Address!
+            <ul className="space-y-2">
+              {[...foundMultisigs].map((msKey, index) => {
+                return (
+                  <li key={`ms-${index}`}>
+                    <Button
+                      className="w-full whitespace-normal break-all"
+                      onClick={async () => {
+                        setForceCancel(true);
+                        await setMultisigAddress.mutateAsync(msKey); // Save using React Query
+                      }}
+                    >
+                      Use {msKey}
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

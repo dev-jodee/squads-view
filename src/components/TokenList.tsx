@@ -17,23 +17,23 @@ export function TokenList({ multisigPda }: TokenListProps) {
     <Card>
       <CardHeader>
         <CardTitle>Tokens</CardTitle>
-        <CardDescription>The tokens you hold in your wallet</CardDescription>
+        <CardDescription>Balances held by the selected vault</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-8">
+        <div className="space-y-4">
           <div>
             <div className="flex items-center">
-              <div className="ml-4 space-y-1">
+              <div className="min-w-0 space-y-1">
                 <p className="text-sm font-medium leading-none">SOL</p>
                 <p className="text-sm text-muted-foreground">
                   Amount: {solBalance ? solBalance / LAMPORTS_PER_SOL : 0}
                 </p>
               </div>
-              <div className="ml-auto">
+              <div className="ml-4 shrink-0">
                 <SendSol multisigPda={multisigPda} vaultIndex={vaultIndex} />
               </div>
             </div>
-            {tokens && tokens.length > 0 ? <hr className="mt-2" /> : null}
+            {tokens && tokens.length > 0 ? <hr className="mt-4 border-border" /> : null}
           </div>
           {tokens &&
             [...tokens]
@@ -49,15 +49,15 @@ export function TokenList({ multisigPda }: TokenListProps) {
               .map((token) => (
               <div key={token.account.data.parsed.info.mint}>
                 <div className="flex items-center">
-                  <div className="ml-4 space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      Mint: {token.account.data.parsed.info.mint}
+                  <div className="min-w-0 space-y-1">
+                    <p className="break-all font-mono text-sm font-medium leading-none">
+                      {token.account.data.parsed.info.mint}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Amount: {token.account.data.parsed.info.tokenAmount.uiAmount}
                     </p>
                   </div>
-                  <div className="ml-auto">
+                  <div className="ml-4 shrink-0">
                     <SendTokens
                       mint={token.account.data.parsed.info.mint}
                       tokenAccount={token.pubkey.toBase58()}
@@ -68,7 +68,7 @@ export function TokenList({ multisigPda }: TokenListProps) {
                     />
                   </div>
                 </div>
-                <hr className="mt-2" />
+                <hr className="mt-4 border-border" />
               </div>
             ))}
         </div>

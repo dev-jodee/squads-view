@@ -1,30 +1,16 @@
-import { ArrowDownUp, LucideHome, Settings, Users, Box, Server, createLucideIcon } from 'lucide-react';
+import { ArrowDownUp, Settings, Users, Box } from 'lucide-react';
 import ConnectWallet from '@/components/ConnectWalletButton';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { ChangeMultisigFromNav } from './ChangeMultisigFromNav';
 
-// lucide-react 1.0 removed brand icons; path data copied from lucide-react 0.309.0 (ISC).
-const Github = createLucideIcon('Github', [
-  [
-    'path',
-    {
-      d: 'M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4',
-      key: 'tonef',
-    },
-  ],
-  ['path', { d: 'M9 18c-4.51 2-5-2-7-2', key: '9comsn' }],
-]);
-
 export default function TabNav() {
   const location = useLocation();
   const path = location.pathname;
   const tabs = [
-    { name: 'Home', icon: <LucideHome />, route: '/' },
     { name: 'Transactions', icon: <ArrowDownUp />, route: '/transactions/' },
     { name: 'Configuration', icon: <Users />, route: '/config/' },
     { name: 'Programs', icon: <Box />, route: '/programs/' },
-    { name: 'Validators', icon: <Server />, route: '/validators/' },
     { name: 'Settings', icon: <Settings />, route: '/settings/' },
   ];
 
@@ -68,17 +54,6 @@ export default function TabNav() {
                   </li>
                 );
               })}
-              <li key="github-link" className="pt-1">
-                <Link
-                  to="https://github.com/Squads-Protocol/public-v4-client"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center rounded-md px-3 py-2.5 text-slate-500 transition-colors hover:bg-white/[0.05] hover:text-slate-300"
-                >
-                  <span className="[&>svg]:h-4 [&>svg]:w-4"><Github /></span>
-                  <span className="ml-3 flex-1 whitespace-nowrap text-sm">GitHub</span>
-                </Link>
-              </li>
             </ul>
           </div>
           <div className="space-y-2 border-t border-[#1e2028] pt-4">
@@ -87,13 +62,12 @@ export default function TabNav() {
           </div>
         </div>
       </aside>
-
       <aside
         id="mobile-navbar"
         className="fixed inset-x-0 bottom-0 z-50 block bg-[#111318] border-t border-[#1e2028] p-2 md:hidden"
         aria-label="Mobile navbar"
       >
-        <div className="mx-auto mt-1 grid h-full max-w-lg grid-cols-6 font-medium">
+        <div className="mx-auto mt-1 grid h-full max-w-lg grid-cols-4 font-medium">
           {tabs.map((tab) => {
             const isActive =
               (path!.startsWith(`${tab.route}/`) && tab.route !== '/') ||

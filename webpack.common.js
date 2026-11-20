@@ -51,6 +51,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'public/index.html',
     }),
+    new webpack.DefinePlugin({
+      'process.env.RPC_URL': JSON.stringify(process.env.RPC_URL || ''),
+    }),
     new webpack.ProvidePlugin({
       process: 'process/browser.js',
       Buffer: ['buffer', 'Buffer'],
