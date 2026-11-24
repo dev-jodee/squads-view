@@ -10,10 +10,13 @@ import { useMultisig } from '@/hooks/useServices';
 import { renderPermissions } from '@/lib/utils';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Suspense } from 'react';
+import EditLabelButton from '@/components/EditLabelButton';
+import { useAddressLabels } from '@/hooks/useAddressLabels';
 
 const ConfigurationPage = () => {
   const { rpcUrl, multisigAddress, programId } = useMultisigData();
   const { data: multisigConfig } = useMultisig();
+  const { labels } = useAddressLabels();
   return (
     <ErrorBoundary>
       <Suspense fallback={<div>Loading...</div>}>
@@ -43,9 +46,16 @@ const ConfigurationPage = () => {
                         <div key={member.key.toBase58()}>
                           <div className="flex items-center">
                             <div className="min-w-0 space-y-1">
-                              <p className="truncate text-sm font-medium leading-none">
-                                Public Key: {member.key.toBase58()}
-                              </p>
+                              <div className="flex items-center gap-1">
+                                <p
+                                  className="truncate text-sm font-medium leading-none"
+                                  title={member.key.toBase58()}
+                                >
+                                  {labels[member.key.toBase58()] ??
+                                    `Public Key: ${member.key.toBase58()}`}
+                                </p>
+                                <EditLabelButton address={member.key.toBase58()} />
+                              </div>
                               <p className="text-sm text-muted-foreground">
                                 Permissions: {renderPermissions(member.permissions.mask)}
                               </p>

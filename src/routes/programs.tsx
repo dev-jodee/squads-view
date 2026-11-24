@@ -3,11 +3,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PublicKey } from '@solana/web3.js';
+import { cn } from '@/lib/utils';
 import { useMultisig } from '@/hooks/useServices';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Suspense, useState } from 'react';
 import { useProgram, useVaultPrograms } from '../hooks/useProgram';
 import CreateProgramUpgradeInput from '../components/CreateProgramUpgradeInput';
+import EditLabelButton from '@/components/EditLabelButton';
+import { useAddressLabels } from '@/hooks/useAddressLabels';
 
 const ProgramsPage = () => {
   const { data: multisigConfig } = useMultisig();
@@ -20,6 +23,7 @@ const ProgramsPage = () => {
   // Only use the hook when we have a validated program ID
   const { data: programInfos } = useProgram(validatedProgramId);
   const vaultPrograms = useVaultPrograms();
+  const { labels } = useAddressLabels();
 
   // Validate the program ID
   const validateProgramId = () => {
@@ -74,18 +78,24 @@ const ProgramsPage = () => {
                 <p className="text-sm text-muted-foreground">No programs found for this vault.</p>
               )}
               {vaultPrograms.data?.map((program) => (
-                <Button
-                  key={program}
-                  variant={program === validatedProgramId ? 'default' : 'outline'}
-                  className="w-full justify-start whitespace-normal break-all font-mono"
-                  onClick={() => {
-                    setProgramIdInput(program);
-                    setProgramIdError('');
-                    setValidatedProgramId(program);
-                  }}
-                >
-                  {program}
-                </Button>
+                <div key={program} className="flex items-center gap-2">
+                  <Button
+                    variant={program === validatedProgramId ? 'default' : 'outline'}
+                    className={cn(
+                      'flex-1 justify-start whitespace-normal break-all',
+                      !labels[program] && 'font-mono'
+                    )}
+                    title={program}
+                    onClick={() => {
+                      setProgramIdInput(program);
+                      setProgramIdError('');
+                      setValidatedProgramId(program);
+                    }}
+                  >
+                    {labels[program] ?? program}
+                  </Button>
+                  <EditLabelButton address={program} />
+                </div>
               ))}
             </CardContent>
           </Card>
