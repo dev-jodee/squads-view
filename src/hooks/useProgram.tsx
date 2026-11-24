@@ -63,12 +63,25 @@ export const useProgram = (managedProgramId: string | null) => {
 const PROGRAM_DATA_TAG = bs58.encode(Uint8Array.from([3, 0, 0, 0]));
 const PROGRAM_ACCOUNT_SIZE = 36;
 
+const PROGRAM_BY_PROGRAM_DATA_KEY = 'x-program-by-program-data';
+
+const getProgramByProgramData = (): Record<string, string> => {
+  try {
+    return JSON.parse(localStorage.getItem(PROGRAM_BY_PROGRAM_DATA_KEY) || '{}');
+  } catch {
+    return {};
+  }
+};
+
 export const useVaultPrograms = () => {
   const { connection, multisigVault } = useMultisigData();
 
   return useQuery({
     queryKey: ['vaultPrograms', connection.rpcEndpoint, multisigVault?.toBase58()],
     enabled: !!multisigVault,
+    staleTime: Infinity,
+    retry: false,
+    refetchOnWindowFocus: false,
     queryFn: async (): Promise<string[]> => {
       const loader = new PublicKey(BPF_UPGRADEABLE_LOADER_ID);
       const programDatas = await connection.getProgramAccounts(loader, {
@@ -83,21 +96,25 @@ export const useVaultPrograms = () => {
           },
         ],
       });
-      const programs = await Promise.all(
-        programDatas.map(({ pubkey }) =>
-          connection.getProgramAccounts(loader, {
+      const cache = getProgramByProgramData();
+      const programs: string[] = [];
+      for (const { pubkey } of programDatas) {
+        const programData = pubkey.toBase58();
+        if (!cache[programData]) {
+          const [program] = await connection.getProgramAccounts(loader, {
             dataSlice: { offset: 0, length: 0 },
             filters: [
               { dataSize: PROGRAM_ACCOUNT_SIZE },
-              { memcmp: { offset: 4, bytes: pubkey.toBase58() } },
+              { memcmp: { offset: 4, bytes: programData } },
             ],
-          })
-        )
-      );
-      return programs
-        .flat()
-        .map(({ pubkey }) => pubkey.toBase58())
-        .sort();
+          });
+          if (!program) continue;
+          cache[programData] = program.pubkey.toBase58();
+          localStorage.setItem(PROGRAM_BY_PROGRAM_DATA_KEY, JSON.stringify(cache));
+        }
+        programs.push(cache[programData]);
+      }
+      return programs.sort();
     },
   });
 };
